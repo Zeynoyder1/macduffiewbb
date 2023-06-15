@@ -1,0 +1,366 @@
+<head>
+<body>
+<script>
+let Alien;
+let rocks;
+let Plant_tentacles;
+let HPofTheBoss = 0;
+let Second_Boss_Health = 0;
+let level_number = 0;
+let Fireball_count = 0;
+
+function onOverlapTile(sprite2, location2) {
+    sprites.destroy(rocks);
+}
+
+function Second_Boss() {
+    Alien = sprites.create(assets.image`
+        O
+    `, SpriteKind.enemy);
+    Alien.x = 142;
+    Alien.y = 57;
+    Alien.vx = 0;
+    Alien.vy = -21;
+}
+
+function ultimatesolution(trigger) {
+    if (level_number == 1) {
+        Alien.vy = -Alien.vy;
+    } else if (level_number == 2) {
+        Alien2.vy = -Alien2.vy;
+    }
+
+    while (HPofTheBoss > 0) {
+        rocks = sprites.create(rock_list._pickRandom(), SpriteKind.attackfromboss);
+        rocks.x = randint(0, scene.screenWidth());
+        rocks.y = 0;
+        rocks.vx = 0;
+        rocks.vy = 50;
+        break;
+    }
+
+    while (level_number == 2 && Second_Boss_Health > 0) {
+        Plant_tentacles = sprites.create(tenant_list._pickRandom(), SpriteKind.attackfromboss);
+        Plant_tentacles.x = randint(0, scene.screenWidth() - 70);
+
+        if (Math.percentChance(60)) {
+            Plant_tentacles.image.flipY();
+            Plant_tentacles.bottom = 0;
+            Plant_tentacles.ay = 50;
+            break;
+        } else {
+            Plant_tentacles.image.flipY();
+            Plant_tentacles.bottom = 0;
+            Plant_tentacles.ay = 200;
+            break;
+        }
+    }
+
+    if (!trigger) {
+        game.gameOver(true);
+    }
+}
+
+function onOverlap(sprite3, otherSprite) {
+    HPofTheBoss -= 1;
+    Second_Boss_Health -= 1;
+    sprites.destroy(ball);
+    sprites.destroy(Fireball);
+}
+
+function onOverlapTile2(sprite24, location24) {
+    sprites.destroy(Plant_tentacles);
+}
+
+function onBPressed() {
+    if (Fireball_count > 0) {
+        Fireball = sprites.createProjectileFromSprite(img`
+            . . . . . . . . . . . . . . . . 
+            . . . . . . . . . . . . . . . . 
+            . . . . . 4 4 4 4 4 . . . . . . 
+            . . . 4 4 4 5 5 5 d 4 4 4 4 . . 
+            . . 4 d 5 d 5 5 5 d d d 4 4 . . 
+            . . 4 5 5 1 1 1 d d 5 5 5 4 . . 
+            . 4 5 5 5 1 1 1 5 1 1 5 5 4 4 . 
+            . 4 d d 1 1 5 5 5 1 1 5 5 d 4 . 
+            . 4 5 5 1 1 5 1 1 5 5 d d d 4 . 
+            . 2 5 5 5 d 1 1 1 5 1 1 5 5 2 . 
+            . 2 d 5 5 d 1 1 1 5 1 1 5 5 2 . 
+            . . 2 4 d d 5 5 5 5 d d 5 4 . . 
+            . . . 2 2 4 d 5 5 d d 4 4 . . . 
+            . . 2 2 2 2 2 4 4 4 2 2 2 . . . 
+            . . . 2 2 4 4 4 4 4 4 2 2 . . . 
+            . . . . . 2 2 2 2 2 2 . . . . .
+        `),
+        ThePlayer,
+        84,
+        0);
+        Fireball_count += -1;
+        pause(1000);
+    } else {
+        ThePlayer.sayText("MP is not enough!", 500, false);
+    }
+}
+
+controller.B.onEvent(ControllerButtonEvent.Pressed, onBPressed);
+
+let Alien;
+
+function TheBoss() {
+    Alien = sprites.create(assets.image`
+        M
+    `, SpriteKind.enemy);
+    Alien.setPosition(142, 57);
+    Alien.setVelocity(0, -21);
+}
+
+function onAPressed() {
+    ball = sprites.createProjectileFromSprite(img`
+        . . . b b b . . 
+        . . b 5 5 5 b . 
+        . b 5 d 3 d 5 b 
+        . b 5 1 5 3 5 b 
+        . c d 1 5 3 5 c 
+        . c d d 1 d 5 c 
+        . . f d d d f . 
+        . . . f f f . .
+    `, ThePlayer, 50, 0);
+    pause(500);
+    info.changeScoreBy(1);
+}
+
+controller.A.onEvent(ControllerButtonEvent.Pressed, onAPressed);
+
+let level_number = 0;
+
+function onOverlapTile(sprite, location) {
+    level_number += 1;
+    Extra_levels(level_number);
+}
+
+scene.onOverlapTile(SpriteKind.Player, sprites.dungeon.doorOpenEast, onOverlapTile);
+
+function onOnScore() {
+    ultimatesolution(false);
+}
+
+info.onScore(30, onOnScore);
+
+function onOverlapTile2(sprite, location) {
+    sprites.destroy(Plant_tentacles);
+}
+
+scene.onOverlapTile(SpriteKind.AttackFromBoss, sprites.dungeon.greenOuterSouthEast, onOverlapTile2);
+function onOverlapTile5(sprite4, location3) {
+    sprites.destroy(Plant_tentacles);
+}
+
+scene.onOverlapTile(SpriteKind.AttackFromBoss, sprites.dungeon.greenOuterSouth0, onOverlapTile5);
+
+function onOnOverlap2(sprite6, otherSprite3) {
+    info.setLife(0);
+}
+
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, onOnOverlap2);
+
+function Extra_levels(Level_number) {
+    if (Level_number == 1) {
+        tiles.setTilemap(tilemap`
+            level1
+        `);
+    } else {
+        tiles.placeOnTile(ThePlayer, tiles.getTileLocation(1, 5));
+        tiles.setTilemap(tilemap`
+            level4
+        `);
+        Second_Boss();
+    }
+}
+function onOnOverlap3(sprite5, otherSprite2) {
+    info.changeLifeBy(-1);
+    sprites.destroy(rocks);
+}
+
+sprites.onOverlap(SpriteKind.Player, SpriteKind.AttackFromBoss, onOnOverlap3);
+let Fireball = null;
+let ball = null;
+let Plant_tentacles = null;
+let Alien = null;
+let Alien2 = null;
+let rocks = null;
+let tenant_list = [];
+let rock_list = [];
+let Second_Boss_Health = 0;
+let level_number = 0;
+let Fireball_count = 0;
+let HPofTheBoss = 0;
+let ThePlayer = null;
+
+ThePlayer = sprites.create(img`
+    ..99999.....99999.
+    ..95559.....95559.
+    ..95759.....95759.
+    ..957599999995759.
+    ..955593393395559.
+    ..99f992292299f99.
+    ...9f99aaaaa99f9..
+    ...9f933333339f9..
+    ...9fa33f3f33af9..
+    ...93a33f3f33a39..
+    ...93a3333333a39..
+    ...9fa33f3f33af9..
+    ...9f933fff339f9..
+    ...9f993333399f9..
+    ...9f99aa9aa99f9..
+    ...9999339339999..
+    ......9999999.....
+    ..................
+    ..................
+    ..................
+`,
+    SpriteKind.Player);
+
+ scene.cameraFollowSprite(ThePlayer);
+controller.moveSprite(ThePlayer);
+info.setLife(5);
+ThePlayer.z = 5;
+ThePlayer.setPosition(12, 51);
+Extra_levels(1);
+TheBoss();
+Music();
+HPofTheBoss = 50;
+info.startCountdown(60);
+info.setScore(0);
+Fireball_count = 5;
+level_number = 1;
+Second_Boss_Health = 100;
+let rock_list = [
+    img`
+        . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . 
+        . . . . . 6 8 6 . . . . . . 
+        . . . . 2 a 8 a 2 . . . . . 
+        . . . . a 2 8 2 a . . . . . 
+        . . . . 8 8 4 8 8 . . . . . 
+        . . . . a 2 8 2 a . . . . . 
+        . . . . 2 a 8 a 2 . . . . . 
+        . . . . . 6 8 6 . . . . . . 
+        . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . .
+    `,
+    img`
+        . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . 
+        . . . . . 6 3 6 . . . . . . 
+        . . . . c 8 3 8 c . . . . . 
+        . . . . 8 c 3 c c . . . . . 
+        . . . . 3 3 4 3 3 . . . . . 
+        . . . . 8 c 3 c 8 . . . . . 
+        . . . . c 8 3 8 8 . . . . . 
+        . . . . . 6 3 6 . . . . . . 
+        . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . .
+    `,
+    img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . 2 3 . 9 . . . . . . . 
+        . . . . . 9 3 2 2 . . . . . . . 
+        . . . . 2 3 3 2 3 2 . . . . . . 
+        . . . . a a a 3 2 . . . . . . . 
+        . . . . . 9 a 2 9 . . . . . . . 
+        . . . . a a 2 . a . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . .
+    `
+];
+
+let tenant_list = [
+    img`
+        . . . . . . . . 2 . . . . . . . 
+        . . . . . . . 2 2 7 . . . . . . 
+        . . . . . . . 7 7 7 . . . . . . 
+        . . . . . . . 7 7 7 . . . . . . 
+        . . . . . . . . 7 7 . . . . . . 
+        . . . . . . . a a 7 . . . . . . 
+        . . . . . . a a 7 7 . . . . . . 
+        . . . . . . a a 7 7 7 . . . . . 
+        . . . . . . 7 7 a a 7 . . . . . 
+        . . . . . . 7 a a 7 . . . . . . 
+        . . . . . . a a 7 7 7 7 . . . . 
+        . . . . . a a a a a 7 . . . . . 
+        . . . . . 7 7 7 a a 7 . . . . . 
+        . . . . . 7 7 a a 7 7 . . . . . 
+        . . . . . a a a 7 7 . . . . . . 
+        . . . . . a 7 7 7 . . . . . . .
+    `,
+    img`
+        . . . . . . . . 5 . . . . . . . 
+        . . . . . . . 5 5 8 . . . . . . 
+        . . . . . . . 8 8 8 . . . . . . 
+        . . . . . . . 8 8 8 . . . . . . 
+        . . . . . . . . 8 8 . . . . . . 
+        . . . . . . . 2 2 8 . . . . . . 
+        . . . . . . 2 2 8 8 . . . . . . 
+        . . . . . . 2 2 8 8 8 . . . . . 
+        . . . . . . 8 8 2 2 8 . . . . . 
+        . . . . . . 8 2 2 8 . . . . . . 
+        . . . . . . 2 2 8 8 8 8 . . . . 
+        . . . . . 2 2 2 2 2 8 . . . . . 
+        . . . . . 8 8 8 2 2 8 . . . . . 
+        . . . . . 8 8 2 2 8 8 . . . . . 
+        . . . . . 2 2 2 8 8 . . . . . . 
+        . . . . . 2 8 8 8 . . . . . . .
+    `,
+    img`
+        . . . . . . . . 8 . . . . . . . 
+        . . . . . . . 8 8 3 . . . . . . 
+        . . . . . . . 3 3 3 . . . . . . 
+        . . . . . . . 3 3 3 . . . . . . 
+        . . . . . . . . 3 3 . . . . . . 
+        . . . . . . . 4 4 3 . . . . . . 
+        . . . . . . 4 4 3 3 . . . . . . 
+        . . . . . . 4 4 3 3 3 . . . . . 
+        . . . . . . 3 3 4 4 3 . . . . . 
+        . . . . . . 3 4 4 3 . . . . . . 
+        . . . . . . 4 4 3 3 3 3 . . . . 
+        . . . . . 4 4 4 4 4 3 . . . . . 
+        . . . . . 3 3 3 4 4 3 . . . . . 
+        . . . . . 3 3 4 4 3 3 . . . . . 
+        . . . . . 4 4 4 3 3 . . . . . . 
+        . . . . . 4 3 3 3 . . . . . . .
+    `
+];
+game.onUpdate(function on_on_update() {
+    if (HPofTheBoss == 0) {
+        sprites.destroy(Alien);
+    }
+    if (Second_Boss_Health == 0) {
+        sprites.destroy(Alien2);
+        game.gameOver(true);
+    }
+});
+game.onUpdateInterval(2000, function on_update_interval() {
+    ultimatesolution(true);
+});
+
+ </script> 
+
+</body>
+</head>
